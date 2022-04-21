@@ -64,13 +64,13 @@ public class Outcomes extends Drafter {
 	for(var entry : opps.entrySet())
 	    DEBUGF(1, "%s : %s%n", entry.getKey(), entry.getValue());
 
-	println();
+	DEBUG();
 
 	DEBUG(2, "SCORES:");
 	for(var entry : scores.entrySet())
 	    DEBUGF(1, "%s : %d%n", entry.getKey(), entry.getValue());
 
-	println();
+	DEBUG();
 
 	DEBUG(2, "OPEN RESULTS:");
 	for(var entry : free.entrySet())
