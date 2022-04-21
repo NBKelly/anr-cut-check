@@ -83,10 +83,16 @@ public class Outcomes extends Drafter {
 	else {
 	    println(calculate_outcomes(opps, scores, free, roundCount, cutSize, false));
 	    println(calculate_outcomes(opps, scores, free, roundCount, cutSize, true));
+
+	    var playersSafeToID = safeToId(opps, scores, free, roundCount, cutSize);
+	    var ssf_simple = sweepSplitFold(opps, scores, free, roundCount, cutSize);
+	    println("PLAYERS UP FOR CONTENTION");
+	    sweepSplitFold_display(ssf_simple);
 	}
 
-	safeToId(opps, scores, free, roundCount, cutSize);
 	
+	
+	//println(ssf_simple);
 	return DEBUG(1, t.split("Finished Processing"));
     }
 
@@ -108,6 +114,109 @@ public class Outcomes extends Drafter {
 	}
 
 	return safe_to_id;
+    }
+
+    private HashMap<String, ArrayList<Double>>
+	sweepSplitFold(HashMap<String, TreeSet<String>> opponents, HashMap<String, Integer> scores,
+		       HashMap<String, String> free, int num_rounds, int cut_size) {
+	TreeSet<String> free_players = new TreeSet<>();
+
+	for(var entry : free.entrySet()) {
+	    free_players.add(entry.getKey());
+	    free_players.add(entry.getValue());
+	}
+
+	var res = new HashMap<String, ArrayList<Double>>();
+	for(var player : free_players)
+	    res.put(player, sweepSplitFold(player, opponents, scores, free, num_rounds, cut_size));
+
+	return res;
+    }
+
+    private void sweepSplitFold_display(HashMap<String, ArrayList<Double>> res) {
+	ArrayList<String> lines = new ArrayList<String>();
+
+	for(var entry : res.entrySet()) {
+	    if(entry.getValue().get(0) > 0d) {//there's a snowball's chance
+		lines.add(String.format("%-20s %7.3f%% %7.3f%% %7.3f%%",
+					entry.getKey(),
+					entry.getValue().get(0),
+					entry.getValue().get(1),
+					entry.getValue().get(2)));
+	    }}
+
+	Collections.sort(lines);
+
+	println("                         SWEEP   SPLIT     FOLD");
+	for(var line : lines)
+	    println(line);
+    }
+
+    private ArrayList<Double> sweepSplitFold(String player,
+					      HashMap<String, TreeSet<String>> opponents,
+					      HashMap<String, Integer> scores, //clone
+					      HashMap<String, String> free, //clone
+					      int num_rounds, int cut_size) {
+	var new_free = (HashMap<String, String>)(free.clone());
+
+	var s1 = (HashMap<String, Integer>)(scores.clone());
+	var s2 = (HashMap<String, Integer>)(scores.clone());
+	var s3 = (HashMap<String, Integer>)(scores.clone());
+
+	var left_player = player;
+	String right_player = null;
+	for(var entry : new_free.entrySet())
+	    if(entry.getKey().equals(player) || entry.getValue().equals(player)) {
+		new_free.remove(entry.getKey());
+		if(entry.getKey().equals(player))
+		    right_player = entry.getValue();
+		else
+		    right_player = entry.getKey();
+
+		break;
+	    }
+
+	s1.put(left_player, s1.get(left_player) + 6); //sweep
+	s2.put(left_player, s2.get(left_player) + 3); //split city
+	s2.put(right_player, s2.get(right_player) + 3); //split city
+	s3.put(right_player, s3.get(right_player) + 6); //sweep
+
+
+	var outcomes1 = new HashMap<String, Integer>();
+	var outcomes2 = new HashMap<String, Integer>();
+	var outcomes3 = new HashMap<String, Integer>();
+
+	var twofourone = false;
+	    /* run all 3 simulations */
+	calculate_recursive(opponents, s1, new_free, num_rounds, cut_size,
+			    outcomes1, twofourone);
+	calculate_recursive(opponents, s2, new_free, num_rounds, cut_size,
+			    outcomes2, twofourone);
+	calculate_recursive(opponents, s3, new_free, num_rounds, cut_size,
+			    outcomes3, twofourone);
+
+	var outcomes = new ArrayList<HashMap<String, Integer>>();
+	outcomes.add(outcomes1);
+	outcomes.add(outcomes2);
+	outcomes.add(outcomes3);
+	
+	ArrayList<Double> res = new ArrayList<Double>();
+
+	for(var outcome : outcomes) {
+	    if(!outcome.containsKey(player)) {
+		res.add(0d);
+		continue;
+	    }
+	    
+	    var total = 0;
+	    for(var entry : outcome.entrySet())
+		total += entry.getValue();
+
+	    var outcome_result = (outcome.get(player)/ (double)total) *(100*cut_size);
+	    res.add(outcome_result);
+	}
+
+	return res;
     }
 
     private boolean safeToId(String player, HashMap<String, TreeSet<String>> opponents,
@@ -152,8 +261,6 @@ public class Outcomes extends Drafter {
 	
 	return outcome * cut_size == total;
     }
-
-    /* todo: needs to ID */
     
     private String calculate_outcomes(HashMap<String, TreeSet<String>> opponents,
 				    HashMap<String, Integer> scores,
@@ -216,8 +323,11 @@ public class Outcomes extends Drafter {
 		odds.add(new Odd(entry.getKey(), entry.getValue(), total, cut_size));
 		
 	    Collections.sort(odds);
-		
-	    res.append(String.format("ODDS FOR TOP %d CUT (241's enforced):%n", cut_size));
+
+	    if(twofourone)
+		res.append(String.format("ODDS FOR TOP %d CUT (241's enforced):%n", cut_size));
+	    else
+		res.append(String.format("ODDS FOR TOP %d CUT (all ourcomes):%n", cut_size));
 	    for(var odd : odds)
 		res.append(odd + "\n");
 
