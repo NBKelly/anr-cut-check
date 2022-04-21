@@ -1,18 +1,18 @@
 ## Objective
 Find out information on how safe it is to ID, or your odds of making it into a cut, during the final round of a tournament. Alternatively, if the tournament is concluded, calculate the SoS/ESoS/placings.
 
-Byes are accounted for, and (as far as I can tell) all results line up with the algorithms used by cobr.ai.
+Byes are accounted for, but duplicate player names, or any jokesters that want to name themselves (Bye), are not. As far as I can tell, all results line up with the algorithms used by cobr.ai.
 
 ## Usage
-
-Generate pairings (scrape from cobra.ai) with Pairings.py and a tournament ID, ie:
-```
-python3 Pairings.py 2337 > pairings.txt
-```
 
 Compile the java class
 ```
 javac com/nbkelly/outcomes/Outcomes.java
+```
+
+Generate pairings (scrape from cobra.ai) with Pairings.py and a tournament ID, ie:
+```
+python3 Pairings.py 2337 > pairings.txt
 ```
 
 Run the script with the file you generated, the number of rounds, and the cut size (in this case, 4, 4).
@@ -95,9 +95,9 @@ jtfq99999            100.000%  69.136%   0.000%
 lukevanryn           100.000%  18.107%   0.000%
 ```
 
-## Issues
+## Issues/TODO
 I need to filter out cut games for concluded tournaments.
 
-I want to do a little pre-processing, and find the players who **1)** can only make the cut if they 241 (for both of them), or **2)** always make the cut if they ID, and then use that to produce slightly better data.
+If we can find players who 100% should ID, then we can make more inferences about how the other players should behave.
 
-Later, this will be hooked up to a web frontnd.
+Later, this will be hooked up to a web frontend.
