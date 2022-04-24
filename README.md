@@ -5,6 +5,14 @@ Byes are accounted for, but duplicate player names, or any jokesters that want t
 
 ## Usage
 
+For simple usage, you can just run the `standings.sh` script, like so:
+
+```
+standings.sh [cobr.ai ID] [rounds] [cut-size]
+```
+
+Alternatively, follow these directions:
+
 Compile the java class
 ```
 javac com/nbkelly/outcomes/Outcomes.java
@@ -95,9 +103,16 @@ jtfq99999            100.000%  69.136%   0.000%
 lukevanryn           100.000%  18.107%   0.000%
 ```
 
+## Additional Arguments
+
+* Help: `-h` - shows you all the arguments
+* Inspect Player: `--inspect-player --show-me -ip [name]` - shows you all the free scenarios in which a player can make it to the cut (limited by `--scenario-max`)
+* Show Opponents: `--pairings --show-opponents -sp [name]` - shows you all the opponents of a player, and their scores
+* Scenario Max: `--max --scenario-max [name]` - sets the maximum scenarios shown on inspect-player (default: 5)
+
 ## Issues/TODO
 I need to filter out cut games for concluded tournaments.
 
 If we can find players who 100% should ID, then we can make more inferences about how the other players should behave.
 
-Later, this will be hooked up to a web frontend.
+Later, this will be hooked up to a web frontend or ported to typescript.
