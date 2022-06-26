@@ -1,3 +1,13 @@
+## Cobra Commander
+
+See the webapp here: https://nbkelly.github.io/anr-cut-check/.
+
+Actually checking cut odds is limited to cases when there are 12 or less unreported pairs left. The equation has 3^p time complexity, and javascript is very slow, so it's better not to push it.
+
+I'll add more features to this eventually (inspect player, scenarios).
+
+The situations where this is useful are during asyncs and when waiting for rounds to end, and for keeping easy tabs on what games you can watch.
+
 ## Objective
 Find out information on how safe it is to ID, or your odds of making it into a cut, during the final round of a tournament. Alternatively, if the tournament is concluded, calculate the SoS/ESoS/placings.
 
